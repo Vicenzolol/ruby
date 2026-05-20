@@ -1,0 +1,39 @@
+<%= form_with model: [@project || task.project, task], class: "space-y-5" do |f| %>
+  <% if task.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+      <p class="font-semibold mb-1">
+        <%= pluralize(task.errors.count, "erro", "erros") %> impediram salvar a tarefa:
+      </p>
+      <ul class="list-disc list-inside space-y-0.5">
+        <% task.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :title, "Título da tarefa", class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.text_field :title, placeholder: "Ex: Criar tela de login",
+        class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+  </div>
+
+  <div>
+    <%= f.label :description, "Descrição (opcional)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.text_area :description, rows: 3, placeholder: "Detalhes da tarefa...",
+        class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none" %>
+  </div>
+
+  <div>
+    <%= f.label :status, "Status", class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.select :status,
+        [["A Fazer", "todo"], ["Em Andamento", "in_progress"], ["Concluído", "done"]],
+        {},
+        class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white" %>
+  </div>
+
+  <div class="pt-2">
+    <%= f.submit task.new_record? ? "Criar Tarefa" : "Salvar Alterações",
+        class: "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg cursor-pointer transition-colors" %>
+  </div>
+<% end %>

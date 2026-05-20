@@ -8,11 +8,35 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Não lançado]
 
 ### Planejado
-- Phase 5: CRUD completo com Tailwind
 - Phase 6: Hotwire/Turbo real-time (Turbo Frames + Streams)
 - Phase 7: API REST `/api/v1`
 - Phase 8: Testes com RSpec
 - Phase 9: Deploy no Render.com
+
+---
+
+## [0.5.0] — 2026-05-20 — Phase 5: CRUD completo com Tailwind CSS
+
+### Adicionado
+- **Rotas aninhadas (shallow)**: `resources :projects do; resources :tasks, shallow: true; end`
+  - Tarefas herdam `project_id` na criação mas usam rotas próprias em edit/update/destroy
+- **`ProjectsController`**: 7 actions CRUD com autorização — `Current.user.projects.find` garante que usuário só acessa seus dados
+  - `show`: monta `@tasks_by_status` hash (todo/in_progress/done) para o board Kanban
+  - `project_params` via `params.expect` (Rails 8 strong parameters)
+- **`TasksController`**: 6 actions CRUD com autorização via JOIN — `Task.joins(:project).where(projects: { user_id: ... })`
+  - `before_action :set_project` em new/create; `before_action :set_task` em show/edit/update/destroy
+- **Views Projects**:
+  - `index.html.erb`: grid responsivo de cards com link para novo projeto
+  - `show.html.erb`: board Kanban 3 colunas (A Fazer / Em Andamento / Concluído) com contadores e link de nova tarefa por coluna
+  - `new.html.erb` / `edit.html.erb`: formulários com partial `_form`
+  - `_project.html.erb`: card com cor, nome, contagem de tarefas, links para ver/editar
+  - `_form.html.erb`: campos nome, descrição, seletor visual de cores (paleta de 8 dots com radio buttons), exibição de erros
+- **Views Tasks**:
+  - `new.html.erb` / `edit.html.erb`: formulários com partial `_form`
+  - `_task.html.erb`: card com badge de status colorido, título, descrição, links editar/excluir
+  - `_form.html.erb`: campos título, descrição, select de status em português
+- **Navbar**: adicionado link "Meus Projetos" quando autenticado
+- **Autorização básica**: usuário só vê/edita/exclui seus próprios projetos e tarefas (sem gem extra — ActiveRecord puro)
 
 ---
 
