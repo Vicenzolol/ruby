@@ -10,7 +10,10 @@
     "done"        => "Concluído"
   }
 %>
-<div class="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow">
+<div id="<%= dom_id(task) %>"
+     class="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow cursor-grab active:cursor-grabbing"
+     data-task-id="<%= task.id %>"
+     data-task-status="<%= task.status %>">
   <div class="flex items-start justify-between gap-2">
     <p class="text-sm font-medium text-gray-800 leading-snug"><%= task.title %></p>
     <span class="text-xs px-2 py-0.5 rounded-full flex-shrink-0 <%= status_styles[task.status] %>">

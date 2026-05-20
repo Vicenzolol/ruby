@@ -8,8 +8,36 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Não lançado]
 
 ### Planejado
-- Phase 6: Hotwire/Turbo real-time (Turbo Frames + Streams)
 - Phase 7: API REST `/api/v1`
+- Phase 8: Testes com RSpec
+- Phase 9: Deploy no Render.com
+
+---
+
+## [0.6.0] — 2026-05-20 — Phase 6: Hotwire/Turbo real-time
+
+### Adicionado
+- **importmap-rails instalado**: `config/importmap.rb` criado, `app/javascript/application.js` gerado
+- **Turbo + Stimulus instalados**: `turbo:install stimulus:install` — controllers em `app/javascript/controllers/`
+- **Turbo Frames** — formulário de nova tarefa abre inline na coluna sem recarregar a página
+  - `turbo_frame_tag "new_task_#{status_key}"` em cada coluna do board
+  - `tasks/new.html.erb` envolto no mesmo Turbo Frame — clique em "+ Adicionar tarefa" carrega o form inline
+- **Turbo Streams (broadcast)** — board atualiza em tempo real para todos os navegadores conectados
+  - `turbo_stream_from @project` na view `show.html.erb` inscreve no canal Action Cable do projeto
+  - `Task`: `after_create_commit` → `broadcast_append_to` (adiciona card na coluna)
+  - `Task`: `after_update_commit` → move card entre colunas se status mudou, ou `broadcast_replace` se só editou
+  - `Task`: `after_destroy_commit` → `broadcast_remove_to` (remove card do board)
+  - `create.turbo_stream.erb`: template de resposta que insere o card e restaura o link da coluna
+- **Turbo Stream (response)** — `TasksController#create` responde com `format.turbo_stream` para requisições Turbo
+- **`_task.html.erb`**: adicionado `id="<%= dom_id(task) %>"` para targets dos broadcasts; `data-task-id` e `data-task-status` para o Stimulus
+- **SortableJS** adicionado via importmap (`bin/importmap pin sortablejs`)
+- **Stimulus `BoardController`** (`app/javascript/controllers/board_controller.js`):
+  - Drag-and-drop entre colunas usando SortableJS com `group: "kanban"`
+  - `onEnd`: envia `PATCH` com CSRF token para `update_task_status_project_path` atualizando o status
+  - Reverte posição visual se o servidor rejeitar
+- **`ProjectsController#update_task_status`**: nova action `PATCH /projects/:id/update_task_status` para receber drops
+- **`show.html.erb`** atualizado: `data-controller="board"`, `data-board-target="column/taskList"`, `data-status` em cada lista
+- **Action Cable**: `async` adapter em development (sem Redis), `redis` em production
 - Phase 8: Testes com RSpec
 - Phase 9: Deploy no Render.com
 

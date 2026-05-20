@@ -5,13 +5,16 @@ class TasksController < ApplicationController
   def show; end
 
   def new
-    @task = @project.tasks.build
+    @task = @project.tasks.build(status: params[:status] || :todo)
   end
 
   def create
     @task = @project.tasks.build(task_params)
     if @task.save
-      redirect_to @project, notice: "Tarefa criada com sucesso!"
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to @project, notice: "Tarefa criada com sucesso!" }
+      end
     else
       render :new, status: :unprocessable_entity
     end

@@ -42,8 +42,8 @@ ruby/
 | 2 | Criar projeto Rails 8 + banco de dados | ✅ Concluído |
 | 3 | Autenticação nativa Rails 8 (sem Devise) | ✅ Concluído |
 | 4 | Models com ActiveRecord ORM (validações, associations, enums, scopes) | ✅ Concluído |
-| 5 | CRUD completo com Tailwind CSS | ⬜ Planejado |
-| 6 | Hotwire/Turbo real-time (Frames + Streams + Stimulus) | ⬜ Planejado |
+| 5 | CRUD completo com Tailwind CSS | ✅ Concluído |
+| 6 | Hotwire/Turbo real-time (Frames + Streams + Stimulus) | ✅ Concluído |
 | 7 | API REST `/api/v1` com autenticação por token | ⬜ Planejado |
 | 8 | Testes com RSpec (model, request, system specs) | ⬜ Planejado |
 | 9 | Deploy no Render.com | ⬜ Planejado |

@@ -1,5 +1,5 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: %i[show edit update destroy]
+  before_action :set_project, only: %i[show edit update destroy update_task_status]
 
   def index
     @projects = Current.user.projects.recent
@@ -40,6 +40,15 @@ class ProjectsController < ApplicationController
   def destroy
     @project.destroy
     redirect_to projects_path, notice: "Projeto excluído com sucesso."
+  end
+
+  # PATCH /projects/:id/update_task_status — chamado pelo Stimulus drag-drop
+  def update_task_status
+    task = @project.tasks.find(params[:task_id])
+    task.update!(status: params[:status])
+    head :ok
+  rescue ActiveRecord::RecordNotFound, ArgumentError
+    head :unprocessable_entity
   end
 
   private
