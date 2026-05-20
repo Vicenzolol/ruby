@@ -8,12 +8,31 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Não lançado]
 
 ### Planejado
-- Phase 4: Models Project e Task com ActiveRecord ORM
 - Phase 5: CRUD completo com Tailwind
 - Phase 6: Hotwire/Turbo real-time (Turbo Frames + Streams)
 - Phase 7: API REST `/api/v1`
 - Phase 8: Testes com RSpec
 - Phase 9: Deploy no Render.com
+
+---
+
+## [0.4.0] — 2026-05-20 — Phase 4: Models com ActiveRecord ORM
+
+### Adicionado
+- **Model `Project`**: associação `belongs_to :user`, `has_many :tasks, dependent: :destroy`
+  - Validações: `name` obrigatório (máx. 100 chars), `color` restrito a paleta de 8 cores hex
+  - Constante `COLORS` com paleta predefinida de cores
+  - Scope `recent` ordenando por `created_at DESC`
+- **Model `Task`**: associação `belongs_to :project`
+  - Enum `status` com três estados: `todo (0)`, `in_progress (1)`, `done (2)` — demonstra `enum` do Rails
+  - Validações: `title` obrigatório (máx. 200 chars)
+  - Scopes: `by_status` (filtra por status), `ordered` (ordena por `position`)
+  - Callback `before_create :set_position` — atribui posição sequencial automática por projeto
+- **Model `User`**: adicionado `has_many :projects, dependent: :destroy`
+- Migrations criadas e executadas — tabelas `projects` e `tasks` no banco
+- Factories RSpec geradas: `spec/factories/projects.rb`, `spec/factories/tasks.rb`
+- Specs geradas: `spec/models/project_spec.rb`, `spec/models/task_spec.rb`
+- README raiz atualizado como hub de documentação com roadmap de aprendizado
 
 ---
 
