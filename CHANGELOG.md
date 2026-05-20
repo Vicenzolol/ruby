@@ -8,9 +8,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Não lançado]
 
 ### Planejado
-- Phase 7: API REST `/api/v1`
 - Phase 8: Testes com RSpec
 - Phase 9: Deploy no Render.com
+
+---
+
+## [0.7.0] — 2026-05-20 — Phase 7: API REST `/api/v1`
+
+### Adicionado
+- **Migration**: coluna `api_token` (string, unique) na tabela `users`
+- **`User` model**: `before_create :generate_api_token` (gera token único `SecureRandom.urlsafe_base64(32)`), `self.authenticate_by_token`, `regenerate_api_token!`
+- **`Api::V1::BaseController`** (`ActionController::API`): autenticao por `Authorization: Bearer <token>` — retorna 401 com mensagem em português se ausente ou inválido
+- **`Api::V1::ProjectsController`**: CRUD completo (index, show, create, update, destroy) — autorização por `current_user.projects`
+  - `show` inclui array de tarefas (`include_tasks: true`)
+- **`Api::V1::TasksController`**: index (com filtro `?status=todo|in_progress|done`), show, create, update, destroy — autorização via JOIN
+- **`Api::V1::UsersController#me`**: `GET /api/v1/me` retorna dados do usuário + `api_token`
+- **Rotas**: namespace `api > v1` com resources aninhados (`projects > tasks`) e rota `me`
+- **`api.http`**: arquivo REST Client com todos os endpoints documentados e exemplos de requisições (incluindo casos de erro 401)
 
 ---
 

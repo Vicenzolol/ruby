@@ -1,0 +1,146 @@
+# KanbanFlow API v1 — arquivo de testes REST Client (VS Code)
+# Extensão: humao.rest-client
+#
+# Como usar:
+#   1. Rode a app: cd kanbanflow && bin/dev
+#   2. Obtenha seu token em: GET http://127.0.0.1:3000/api/v1/me
+#      (use o token exibido no banco ou após criar conta)
+#   3. Substitua {{token}} pelo seu api_token
+#   4. Clique em "Send Request" acima de cada bloco
+
+@baseUrl = http://127.0.0.1:3000/api/v1
+@token   = SEU_TOKEN_AQUI
+
+###
+# ─── USUÁRIO ────────────────────────────────────────────────────────────────
+
+### Dados do usuário autenticado (e seu api_token)
+GET {{baseUrl}}/me
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# ─── PROJETOS ────────────────────────────────────────────────────────────────
+
+### Listar todos os projetos
+GET {{baseUrl}}/projects
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Ver um projeto específico (com suas tarefas)
+GET {{baseUrl}}/projects/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Criar novo projeto
+POST {{baseUrl}}/projects
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "project": {
+    "name": "Projeto via API",
+    "description": "Criado pelo REST Client do VS Code",
+    "color": "#3b82f6"
+  }
+}
+
+###
+
+### Atualizar projeto
+PATCH {{baseUrl}}/projects/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "project": {
+    "name": "Nome Atualizado",
+    "color": "#22c55e"
+  }
+}
+
+###
+
+### Excluir projeto
+DELETE {{baseUrl}}/projects/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# ─── TAREFAS ─────────────────────────────────────────────────────────────────
+
+### Listar tarefas de um projeto
+GET {{baseUrl}}/projects/1/tasks
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Filtrar tarefas por status (todo | in_progress | done)
+GET {{baseUrl}}/projects/1/tasks?status=todo
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Ver tarefa específica
+GET {{baseUrl}}/tasks/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Criar nova tarefa
+POST {{baseUrl}}/projects/1/tasks
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "task": {
+    "title": "Tarefa criada pela API",
+    "description": "Adicionada via REST Client",
+    "status": "todo"
+  }
+}
+
+###
+
+### Mover tarefa para Em Andamento
+PATCH {{baseUrl}}/tasks/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "task": {
+    "status": "in_progress"
+  }
+}
+
+###
+
+### Excluir tarefa
+DELETE {{baseUrl}}/tasks/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# ─── ERROS (para ver respostas de erro) ─────────────────────────────────────
+
+### Sem token — deve retornar 401
+GET {{baseUrl}}/projects
+Accept: application/json
+
+###
+
+### Token inválido — deve retornar 401
+GET {{baseUrl}}/projects
+Authorization: Bearer token_invalido_aqui
+Accept: application/json
