@@ -1,59 +1,44 @@
 # Aprendendo Ruby on Rails 8
 
-Repositório de aprendizado prático de **Ruby on Rails 8** — construindo um projeto real do zero ao deploy, cobrindo todos os conceitos essenciais do framework.
+Repositório de aprendizado prático de **Ruby on Rails 8** — construindo um projeto real do zero ao deploy.
 
-## O projeto: Aprendendo e Fazendo Kanban
+## O projeto
 
-Um gerenciador de tarefas Kanban com atualizações em tempo real. Escolhido por cobrir naturalmente todos os tópicos relevantes: autenticação, CRUD, ORM, real-time, API REST, testes e deploy.
+**Aprendendo e Fazendo Kanban** — gerenciador de tarefas com board Kanban, autenticação, API REST e atualizações em tempo real.
 
-**→ [Documentação completa do projeto](kanbanflow/README.md)**
+**→ [Setup, rotas e instruções para rodar o projeto](kanbanflow/README.md)**
 
-## Tecnologias
+## Stack
 
-| | Tecnologia | Por quê |
-|---|---|---|
-| 🔴 | Ruby 3.4 | Linguagem principal — elegante, expressiva |
-| 🚂 | Rails 8.1 | Framework MVC full-stack mais produtivo |
-| 🐘 | PostgreSQL | Banco relacional robusto para produção |
-| 🎨 | Tailwind CSS 4 | Estilização sem sair do HTML |
-| ⚡ | Hotwire (Turbo + Stimulus) | Real-time sem escrever muito JavaScript |
-| 🧪 | RSpec + Capybara | Testes unitários e E2E |
-| 🚀 | Render.com | Deploy gratuito com PostgreSQL gerenciado |
+| | Tecnologia |
+|---|---|
+| 🔴 | Ruby 3.4 |
+| 🚂 | Rails 8.1 |
+| 🐘 | PostgreSQL |
+| 🎨 | Tailwind CSS 4 |
+| ⚡ | Hotwire (Turbo + Stimulus) |
+| 🧪 | RSpec + Capybara |
+| 🚀 | Render.com |
 
-## Neste repositório
-
-```
-ruby/
-├── kanbanflow/        ← Aplicação Rails (código principal)
-│   ├── app/           ← Models, Controllers, Views
-│   ├── config/        ← Rotas, banco, inicializadores
-│   ├── db/            ← Migrations e schema
-│   ├── spec/          ← Testes RSpec
-│   └── README.md      ← Docs: setup, rotas, API, deploy
-├── CHANGELOG.md       ← Histórico de mudanças por fase
-└── plan.md            ← Plano completo de aprendizado (todas as fases)
-```
-
-## Roadmap de aprendizado
+## Roadmap
 
 | Fase | Tópico | Status |
 |---|---|---|
 | 1 | Setup WSL2 + Ruby + PostgreSQL | ✅ Concluído |
 | 2 | Criar projeto Rails 8 + banco de dados | ✅ Concluído |
 | 3 | Autenticação nativa Rails 8 (sem Devise) | ✅ Concluído |
-| 4 | Models com ActiveRecord ORM (validações, associations, enums, scopes) | ✅ Concluído |
+| 4 | Models com ActiveRecord ORM | ✅ Concluído |
 | 5 | CRUD completo com Tailwind CSS | ✅ Concluído |
-| 6 | Hotwire/Turbo real-time (Frames + Streams + Stimulus) | ✅ Concluído |
-| 7 | API REST `/api/v1` com autenticação por token | ✅ Concluído |
-| 8 | Testes com RSpec (model, request, system specs) | ⬜ Planejado |
+| 6 | Hotwire/Turbo real-time | ✅ Concluído |
+| 7 | API REST `/api/v1` com token | ✅ Concluído |
+| 8 | Testes com RSpec | ⬜ Planejado |
 | 9 | Deploy no Render.com | ⬜ Planejado |
 
-**→ [Ver histórico detalhado de mudanças](CHANGELOG.md)**
-**→ [Ver plano completo](plan.md)**
+## Documentação
 
-## Links úteis
-
-- [Ruby on Rails Guides](https://guides.rubyonrails.org/) — documentação oficial
-- [ruby-lang.org/pt](https://www.ruby-lang.org/pt/) — Ruby em português
-- [Hotwire](https://hotwired.dev/) — Turbo + Stimulus
-- [Tailwind CSS](https://tailwindcss.com/) — utilitários CSS
+| Documento | Conteúdo |
+|---|---|
+| [kanbanflow/README.md](kanbanflow/README.md) | Setup local, rotas, API, deploy |
+| [CHANGELOG.md](CHANGELOG.md) | Histórico de funcionalidades por fase |
+| [BUGFIX.md](BUGFIX.md) | Registro de bugs encontrados e corrigidos |
+| [plan.md](plan.md) | Plano completo de aprendizado |
