@@ -114,6 +114,53 @@ Construir "KanbanFlow", um gerenciador de tarefas Kanban full-featured em Rails 
 6. `respond_to` blocks nos controllers principais (HTML + JSON)
 7. Testar com REST Client (VS Code) ou arquivo `.http`
 
+## Phase 7.1: Documentação Swagger (rswag) ✨ Bônus
+> Depende da Phase 7 (API) e da Phase 8 (RSpec) — idealmente feita após as duas.
+> A gem `rswag` gera um Swagger/OpenAPI 3.0 interativo a partir dos próprios testes RSpec.
+
+1. Adicionar gems ao Gemfile:
+   ```ruby
+   gem "rswag-api"   # serve o JSON do spec em /api-docs
+   gem "rswag-ui"    # interface Swagger UI em /api-docs (HTML)
+   group :development, :test do
+     gem "rswag-specs"  # DSL RSpec para escrever os specs que geram o YAML
+   end
+   ```
+2. `bundle install`
+3. `rails generate rswag:install`
+   - Cria: `spec/swagger_helper.rb`, `config/initializers/rswag_api.rb`, `config/initializers/rswag_ui.rb`
+   - Monta rota `/api-docs` automaticamente
+4. Escrever specs Swagger em `spec/requests/api/v1/` usando DSL do rswag:
+   ```ruby
+   # spec/requests/api/v1/projects_spec.rb
+   path '/api/v1/projects' do
+     get 'Lista projetos' do
+       tags 'Projetos'
+       security [bearer: []]
+       response '200', 'sucesso' do
+         schema type: :array, items: { '$ref' => '#/components/schemas/Project' }
+         run_test!
+       end
+       response '401', 'não autorizado' do
+         run_test!
+       end
+     end
+   end
+   ```
+5. Definir schemas OpenAPI em `spec/swagger_helper.rb`:
+   - `Project`: id, name, description, color, tasks_count, created_at
+   - `Task`: id, project_id, title, description, status (enum), position, created_at
+   - `securitySchemes`: bearerAuth (HTTP Bearer)
+6. `bundle exec rake rswag:specs:swaggerize` → gera `swagger/v1/swagger.yaml`
+7. Acessar `http://localhost:3000/api-docs` → Swagger UI interativo
+   - Botão "Authorize" para inserir o Bearer token
+   - Testar todos os endpoints diretamente no browser
+
+### Resultado esperado
+- `/api-docs` → Swagger UI completo e interativo
+- `/api-docs/v1/swagger.yaml` → spec OpenAPI 3.0 para integrar com outras ferramentas
+- Documentação sempre sincronizada com os testes (não fica desatualizada)
+
 ## Phase 8: Testes com RSpec
 1. `rails generate rspec:install`
 2. Configurar FactoryBot + Faker + Capybara no spec_helper
