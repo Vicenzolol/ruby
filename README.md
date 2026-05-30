@@ -34,7 +34,8 @@ Repositório de aprendizado prático de **Ruby on Rails 8** — construindo um p
 | 7 | API REST `/api/v1` com token | ✅ Concluído |
 | 7.1 | Documentação Swagger/OpenAPI (rswag) | ✅ Concluído |
 | 7.2 | Serialização Jbuilder + paginação pagy | ✅ Concluído |
-| 8 | Testes com RSpec | ⬜ Planejado |
+| 8 | Testes com RSpec (model, request, system, seeds, SimpleCov) | ✅ Concluído |
+| 8.1 | Segurança e Hardening | ⬜ Planejado |
 | 9 | Deploy no Render.com | ⬜ Planejado |
 
 ## Documentação

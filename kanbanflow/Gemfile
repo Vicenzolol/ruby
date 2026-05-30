@@ -64,6 +64,8 @@ group :development, :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
   gem "faker"
+  # Matchers elegantes para validações e associations (belong_to, have_many, validate_presence_of...)
+  gem "shoulda-matchers"
   # Generates swagger.yaml a partir dos testes RSpec
   gem "rswag-specs"
 end
@@ -77,4 +79,6 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+  # Code coverage — relatório gerado em coverage/index.html após bundle exec rspec
+  gem "simplecov", require: false
 end

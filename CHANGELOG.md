@@ -8,9 +8,43 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Não lançado]
 
 ### Planejado
-- Phase 8: Testes com RSpec
 - Phase 8.1: Segurança e Hardening
 - Phase 9: Deploy no Render.com
+
+---
+
+## [0.9.0] — 2026-05-30 — Phase 8: Testes com RSpec
+
+### Adicionado
+
+#### Infraestrutura de testes
+- **Gem `simplecov`** (group :test): cobertura de código gerada em `coverage/index.html`; threshold mínimo configurado em 65% (alcançável sem Chrome)
+- **Gem `shoulda-matchers`** (group :dev/test): matchers `belong_to`, `have_many`, `validate_presence_of` etc. integrados ao RSpec/Rails
+- **`spec/rails_helper.rb`** atualizado:
+  - SimpleCov iniciado antes de qualquer `require` (obrigatório para medir corretamente)
+  - Filtros de grupo: Models, Controllers, Views, Helpers
+  - `require 'capybara/rails'`
+  - Driver `headless_chrome` configurado para system specs
+  - `Shoulda::Matchers` integrado ao RSpec + Rails
+
+#### Model specs (`spec/models/`)
+- **`user_spec.rb`**: validações email (presença, formato, unicidade, normalização), senha (mínimo 8 chars), geração automática de `api_token`, unicidade do token, `authenticate_by_token`, `regenerate_api_token!`, associations (`has_many sessions/projects` com `dependent: :destroy`)
+- **`project_spec.rb`**: validações `name` (presença, máximo 100 chars), `color` (inclusão na paleta ou em branco), scope `.recent` (ordenação decrescente), constante `COLORS` (8 hexadecimais), `dependent: :destroy` das tasks, `belongs_to :user`
+- **`task_spec.rb`**: validações `title` (presença, máximo 200 chars), enum `status` (todo/in_progress/done + predicados), scopes `.by_status` e `.ordered`, callback `set_position` (sequência por projeto, isolamento entre projetos), `belongs_to :project`
+
+#### Request specs web (`spec/requests/`)
+- **`projects_spec.rb`** (reescrito do stub): redirect sem auth (GET /, /new, /:id), acesso autenticado via POST /session, create 201/422, delete com contagem
+- **`tasks_spec.rb`** (reescrito do stub): redirect sem auth, create 201/422, delete com contagem
+
+#### System specs (`spec/system/`)
+- **`kanban_spec.rb`**: fluxo completo com Capybara/headless Chrome — cadastro, login/logout, criação de projeto, visualização do board, criação de tarefa; requer `google-chrome-stable` no WSL
+
+#### Seeds
+- **`db/seeds.rb`** reescrito com Faker: 2 usuários fixos (`admin@`, `dev@`), 3 projetos cada com Faker::App.name, 5–10 tasks por projeto com statuses variados; idempotente via `find_or_initialize_by`
+
+#### Resultados
+- **86 exemplos, 0 falhas** (`spec/models/` + `spec/requests/`)
+- Cobertura: **67.38%** (219/325 linhas) — supera o threshold de 65%
 
 ---
 

@@ -1,4 +1,18 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
+
+# SimpleCov deve ser iniciado ANTES de qualquer require da aplicação
+require "simplecov"
+SimpleCov.start "rails" do
+  add_filter "/spec/"
+  add_filter "/config/"
+  add_filter "/db/"
+  add_group "Models",      "app/models"
+  add_group "Controllers", "app/controllers"
+  add_group "Views",       "app/views"
+  add_group "Helpers",     "app/helpers"
+  minimum_coverage 65
+end
+
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
@@ -8,6 +22,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 # that will avoid rails generators crashing because migrations haven't been run yet
 # return unless Rails.env.test?
 require 'rspec/rails'
+require 'capybara/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -71,4 +86,28 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+end
+
+# ─── Capybara / System specs ──────────────────────────────────────────────────
+# Driver padrão: headless Chrome (requer Google Chrome instalado no WSL).
+# Para instalar: sudo apt-get install -y google-chrome-stable
+Capybara.register_driver :headless_chrome do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument("--headless=new")
+  options.add_argument("--no-sandbox")
+  options.add_argument("--disable-dev-shm-usage")
+  options.add_argument("--window-size=1400,900")
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+
+Capybara.javascript_driver    = :headless_chrome
+Capybara.default_max_wait_time = 5
+Capybara.server               = :puma, { Silent: true }
+
+# ─── Shoulda Matchers ─────────────────────────────────────────────────────────
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
 end
