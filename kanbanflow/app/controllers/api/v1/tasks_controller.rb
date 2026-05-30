@@ -4,33 +4,34 @@ module Api
       before_action :set_project, only: %i[index create]
       before_action :set_task,    only: %i[show update destroy]
 
-      # GET /api/v1/projects/:project_id/tasks
-      # Aceita ?status=todo|in_progress|done para filtrar
+      # GET /api/v1/projects/:project_id/tasks?status=todo&page=1&per_page=20
+      # Aceita ?status=todo|in_progress|done para filtrar por coluna Kanban
       def index
-        tasks = @project.tasks.ordered
-        tasks = tasks.by_status(params[:status]) if params[:status].present?
-        render json: tasks.map { |t| task_json(t) }
+        scope = @project.tasks.ordered
+        scope = scope.by_status(params[:status]) if params[:status].present?
+        @pagy, @tasks = pagy(scope, limit: params.fetch(:per_page, 20).to_i)
+        # Renderiza app/views/api/v1/tasks/index.json.jbuilder
       end
 
       # GET /api/v1/tasks/:id
       def show
-        render json: task_json(@task)
+        # Renderiza app/views/api/v1/tasks/show.json.jbuilder
       end
 
       # POST /api/v1/projects/:project_id/tasks
       def create
-        task = @project.tasks.build(task_params)
-        if task.save
-          render json: task_json(task), status: :created
+        @task = @project.tasks.build(task_params)
+        if @task.save
+          render :show, status: :created
         else
-          json_error(task.errors.full_messages)
+          json_error(@task.errors.full_messages)
         end
       end
 
       # PATCH /api/v1/tasks/:id
       def update
         if @task.update(task_params)
-          render json: task_json(@task)
+          render :show
         else
           json_error(@task.errors.full_messages)
         end
@@ -58,19 +59,6 @@ module Api
 
       def task_params
         params.require(:task).permit(:title, :description, :status)
-      end
-
-      def task_json(task)
-        {
-          id:          task.id,
-          project_id:  task.project_id,
-          title:       task.title,
-          description: task.description,
-          status:      task.status,
-          position:    task.position,
-          created_at:  task.created_at,
-          updated_at:  task.updated_at
-        }
       end
     end
   end

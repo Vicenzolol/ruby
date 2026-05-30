@@ -1,9 +1,9 @@
 FactoryBot.define do
   factory :task do
-    project { nil }
-    title { "MyString" }
-    description { "MyText" }
-    status { 1 }
-    position { 1 }
+    association :project
+    title       { Faker::Lorem.sentence(word_count: 4).first(100) }
+    description { Faker::Lorem.paragraph }
+    status      { :todo }
+    position    { 1 }
   end
 end

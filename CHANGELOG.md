@@ -8,11 +8,44 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Não lançado]
 
 ### Planejado
-- Phase 7.1: Documentação Swagger (rswag)
-- Phase 7.2: Serialização (Jbuilder) e Paginação (pagy)
 - Phase 8: Testes com RSpec
 - Phase 8.1: Segurança e Hardening
 - Phase 9: Deploy no Render.com
+
+---
+
+## [0.8.0] — 2026-05-31 — Phase 7.1 e 7.2: Swagger, Jbuilder e Paginação
+
+### Adicionado
+
+#### Phase 7.1 — Documentação Swagger (rswag)
+- **Gems**: `rswag-api`, `rswag-ui` (grupo principal); `rswag-specs` (dev/test)
+- **Initializers**: `rswag_api.rb` (`openapi_root`) e `rswag_ui.rb` (`openapi_endpoint`) gerados e corrigidos para API rswag 2.17
+- **Rotas**: `mount Rswag::Ui::Engine => '/api-docs'` e `mount Rswag::Api::Engine => '/api-docs'`
+- **`spec/swagger_helper.rb`**: schema OpenAPI 3.0.1 completo com componentes `Project`, `ProjectWithTasks`, `Task`, `PaginationMeta`, `Error` e esquema de segurança `bearerAuth`
+- **`spec/requests/api/v1/projects_spec.rb`**: specs rswag para todos os endpoints de Projects (13 casos: 200, 201, 204, 401, 404, 422)
+- **`spec/requests/api/v1/tasks_spec.rb`**: specs rswag para todos os endpoints de Tasks (13 casos)
+- **`swagger/v1/swagger.yaml`**: gerado via `RAILS_ENV=test bundle exec rails rswag` — 26 exemplos, 0 falhas
+- Swagger UI disponível em `/api-docs`
+
+#### Phase 7.2 — Serialização Jbuilder e Paginação pagy
+- **Gem pagy 43.x**: `config/initializers/pagy.rb` com `require "pagy/toolbox/paginators/method"`, limite padrão 20, máximo 100
+- **`Api::V1::BaseController`**: inclui `Pagy::Method` (v43+), `ActionView::Rendering`/`Layouts`, `prepend_view_path`, `rescue_from Pagy::RangeError`; `json_error` normaliza arrays
+- **`Api::V1::ProjectsController`**: `index` paginado (`?page=&per_page=`), `render :show` em create/update
+- **`Api::V1::TasksController`**: `index` paginado com filtro `?status=`, `render :show` em create/update
+- **Views Jbuilder**:
+  - `app/views/api/v1/projects/_project.json.jbuilder`
+  - `app/views/api/v1/projects/index.json.jbuilder` — `{ data: [...], meta: { current_page, total_pages, total_count, per_page } }`
+  - `app/views/api/v1/projects/show.json.jbuilder` — projeto + tasks
+  - `app/views/api/v1/tasks/_task.json.jbuilder`
+  - `app/views/api/v1/tasks/index.json.jbuilder` — paginado
+  - `app/views/api/v1/tasks/show.json.jbuilder`
+- **`app/models/task.rb`**: inclui `ActionView::RecordIdentifier` para `dom_id` (Turbo broadcasts)
+- **`api.http`**: adicionados exemplos de paginação com `?page=` e `?per_page=`
+
+#### Infraestrutura de Testes (RSpec/FactoryBot)
+- **`rspec:install`**: `.rspec`, `spec/spec_helper.rb`, `spec/rails_helper.rb` com `FactoryBot::Syntax::Methods`
+- **Factories**: `spec/factories/users.rb` (sequência de email), `spec/factories/projects.rb` (Faker + COLORS), `spec/factories/tasks.rb` (Faker + status)
 
 ---
 

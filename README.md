@@ -32,6 +32,8 @@ Repositório de aprendizado prático de **Ruby on Rails 8** — construindo um p
 | 5 | CRUD completo com Tailwind CSS | ✅ Concluído |
 | 6 | Hotwire/Turbo real-time | ✅ Concluído |
 | 7 | API REST `/api/v1` com token | ✅ Concluído |
+| 7.1 | Documentação Swagger/OpenAPI (rswag) | ✅ Concluído |
+| 7.2 | Serialização Jbuilder + paginação pagy | ✅ Concluído |
 | 8 | Testes com RSpec | ⬜ Planejado |
 | 9 | Deploy no Render.com | ⬜ Planejado |
 

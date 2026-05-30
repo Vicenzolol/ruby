@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :project do
-    user { nil }
-    name { "MyString" }
-    description { "MyText" }
-    color { "MyString" }
+    association :user
+    name        { Faker::App.name.first(50) }
+    description { Faker::Lorem.sentence }
+    color       { Project::COLORS.sample }
   end
 end
