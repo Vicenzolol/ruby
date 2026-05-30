@@ -8,8 +8,37 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Não lançado]
 
 ### Planejado
-- Phase 8.1: Segurança e Hardening
 - Phase 9: Deploy no Render.com
+
+---
+
+## [1.0.0] — 2026-05-30 — Phase 8.1: Segurança e Hardening
+
+### Adicionado
+
+#### Rate Limiting — Rack::Attack (`gem "rack-attack"` 6.8.0)
+- **`config/initializers/rack_attack.rb`** com 4 throttles:
+  - `api/ip`: 60 req/minuto por IP em `/api/v1/*`
+  - `logins/ip`: 5 tentativas de login por IP a cada 20 segundos (`POST /session`)
+  - `logins/email`: 5 tentativas por e-mail normalizado (lowercase+strip) a cada 20 segundos
+  - `passwords/ip`: 5 solicitações de reset de senha por IP por hora (`POST /passwords`)
+- Resposta customizada 429 com `Retry-After` header e corpo JSON em português
+- Middleware registrado via `config.middleware.use Rack::Attack` no `application.rb`
+
+#### Content Security Policy (CSP)
+- **`config/initializers/content_security_policy.rb`** habilitado:
+  - `default_src :self` — bloqueia origens não declaradas por padrão
+  - `script_src :self` + nonce automático por request (`SecureRandom.base64(16)`)
+  - `style_src :self, :unsafe_inline` — necessário para Tailwind CSS + Swagger UI
+  - `connect_src :self, ws://localhost:3000, wss://localhost:3000` — ActionCable / Turbo Streams
+  - `object_src :none` — bloqueia Flash/Java plugins
+  - `frame_ancestors :none` — proteção anti-clickjacking
+  - `content_security_policy_nonce_auto = true` — nonce injetado automaticamente em `javascript_include_tag`
+
+#### Análise de Segurança
+- **Brakeman 8.0.4**: 0 warnings (10 controllers, 6 models, 18 templates escaneados)
+- **bundler-audit** (advisory-db: 1136 advisories): 0 vulnerabilidades
+- Testes: 86 exemplos, 0 falhas mantidos após todas as mudanças
 
 ---
 
