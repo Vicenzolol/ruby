@@ -28,6 +28,7 @@ Repositório de aprendizado prático de **Ruby on Rails 8** — construindo um p
 | 2 | Criar projeto Rails 8 + banco de dados | ✅ Concluído |
 | 3 | Autenticação nativa Rails 8 (sem Devise) | ✅ Concluído |
 | 4 | Models com ActiveRecord ORM | ✅ Concluído |
+| 4.1 | Integridade do banco (constraints + índices) | ✅ Concluído |
 | 5 | CRUD completo com Tailwind CSS | ✅ Concluído |
 | 6 | Hotwire/Turbo real-time | ✅ Concluído |
 | 7 | API REST `/api/v1` com token | ✅ Concluído |

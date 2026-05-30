@@ -60,3 +60,6 @@ build-iPhoneSimulator/
 .vscode/launch.json
 .vscode/tasks.json
 .vscode/*.code-snippets
+
+# Contexto de sessão do Copilot — não deve ser versionado
+proximo_prompt.md

@@ -8,8 +8,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Não lançado]
 
 ### Planejado
+- Phase 7.1: Documentação Swagger (rswag)
+- Phase 7.2: Serialização (Jbuilder) e Paginação (pagy)
 - Phase 8: Testes com RSpec
+- Phase 8.1: Segurança e Hardening
 - Phase 9: Deploy no Render.com
+
+---
+
+## [0.7.1] — 2026-05-30 — Phase 4.1: Integridade do Banco de Dados
+
+### Adicionado
+- **Migration `20260530000001`** `AddDatabaseConstraintsAndIndexes`: garante integridade em nível de banco, não apenas no model
+- **`null: false`** em `tasks.status` — preenche NULLs existentes com `0` (todo) via `change_column_null` com valor padrão antes de aplicar a constraint
+- **`null: false`** em `tasks.title` — impossível criar tarefa sem título mesmo contornando as validações do model
+- **`null: false`** em `projects.name` — idem para projetos
+- **`default: 0`** em `tasks.status` — novas tasks iniciam com status `todo` automaticamente no banco
+- **Índice `index_tasks_on_status`** — evita full table scan ao filtrar tarefas por coluna Kanban
+- **Índice `index_tasks_on_position`** — ordena tarefas eficientemente pelo scope `:ordered`
+- **Índice composto `index_tasks_on_project_id_and_status`** — cobre a query mais frequente da API e do board (`WHERE project_id = X AND status = Y`)
+- **`schema.rb`** atualizado: versão `2026_05_30_000001`, constraints e índices refletidos com precisão
 
 ---
 

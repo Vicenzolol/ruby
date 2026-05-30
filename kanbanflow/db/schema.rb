@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_20_233645) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_30_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,7 +18,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_233645) do
     t.string "color"
     t.datetime "created_at", null: false
     t.text "description"
-    t.string "name"
+    t.string "name", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_projects_on_user_id"
@@ -38,10 +38,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_233645) do
     t.text "description"
     t.integer "position"
     t.bigint "project_id", null: false
-    t.integer "status"
-    t.string "title"
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
     t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_tasks_on_position"
+    t.index ["project_id", "status"], name: "index_tasks_on_project_id_and_status"
     t.index ["project_id"], name: "index_tasks_on_project_id"
+    t.index ["status"], name: "index_tasks_on_status"
   end
 
   create_table "users", force: :cascade do |t|

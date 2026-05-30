@@ -84,6 +84,14 @@ Construir "KanbanFlow", um gerenciador de tarefas Kanban full-featured em Rails 
 7. Callback `before_create` para definir position
 8. `rails db:migrate`
 
+## Phase 4.1: Integridade do Banco de Dados
+1. Criar migration adicionando `null: false` nas colunas obrigatórias: `tasks.title`, `tasks.status`, `projects.name`
+2. Adicionar índice em `tasks.status` para filtros por coluna Kanban sem full table scan
+3. Adicionar índice composto `[project_id, status]` em tasks — query mais frequente da API
+4. Adicionar índice em `tasks.position` para ordenações eficientes no board
+5. Verificar que `schema.rb` reflete todos os constraints — o banco de dados deve garantir integridade, não apenas o model
+6. `bundle exec rails db:migrate` e confirmar `schema.rb` atualizado
+
 ## Phase 5: CRUD Completo — Projects e Tasks
 1. `rails g controller Projects index show new create edit update destroy`
 2. Configurar rotas: `resources :projects do; resources :tasks; end`
@@ -161,14 +169,40 @@ Construir "KanbanFlow", um gerenciador de tarefas Kanban full-featured em Rails 
 - `/api-docs/v1/swagger.yaml` → spec OpenAPI 3.0 para integrar com outras ferramentas
 - Documentação sempre sincronizada com os testes (não fica desatualizada)
 
+## Phase 7.2: Serialização e Paginação da API
+1. Extrair serialização dos controllers para Jbuilder views em `app/views/api/v1/`
+   - `projects/index.json.jbuilder`, `projects/show.json.jbuilder`, `projects/_project.json.jbuilder`
+   - Princípio da Responsabilidade Única: controller orquestra, view serializa
+2. Adicionar gem `pagy` para paginação nos endpoints de listagem
+   - `GET /api/v1/projects?page=1&per_page=20`
+   - `GET /api/v1/projects/:id/tasks?page=1&status=todo`
+   - Response envelope: `{ data: [...], meta: { current_page:, total_pages:, total_count: } }`
+3. Padronizar envelope de erro em todos os endpoints: `{ error: "mensagem" }` com status HTTP correto
+4. Atualizar `api.http` com exemplos de paginação e todos os cenários de erro
+
 ## Phase 8: Testes com RSpec
-1. `rails generate rspec:install`
-2. Configurar FactoryBot + Faker + Capybara no spec_helper
-3. **Model specs**: validações, associations, scopes, enums
-4. **Request specs (API)**: endpoints JSON com autenticação
-5. **System specs (Capybara)**: fluxo completo de login → criar projeto → criar task → mover status
-6. Rodar: `bundle exec rspec --format documentation`
-7. Coverage com SimpleCov (bônus)
+1. Confirmar instalação do RSpec e configurar `spec/rails_helper.rb` com FactoryBot e Faker
+2. Garantir que as **factories** em `spec/factories/` refletem o estado atual dos models com dados realistas via Faker
+3. **Model specs** — testes reais para cada model:
+   - `user_spec.rb`: validação de email (formato, unicidade), comprimento mínimo de password, geração de `api_token` no `before_create`, `authenticate_by_token`
+   - `project_spec.rb`: presença e comprimento máximo de `name`, `color` só aceita valores válidos, scope `recent`, `has_many :tasks dependent: :destroy`
+   - `task_spec.rb`: presença de `title`, enum `status` (todo/in_progress/done), scope `by_status`, scope `ordered`, callback `set_position` incrementa corretamente
+4. **Request specs da API** — fluxos de sucesso e falha:
+   - `spec/requests/api/v1/projects_spec.rb`: index (200), show com tasks (200), create (201), update (200), destroy (204), sem token (401), token inválido (401), projeto de outro usuário (404)
+   - `spec/requests/api/v1/tasks_spec.rb`: index com `?status=` (200), create (201), update de status (200), destroy (204), acesso a task de outro usuário (404)
+5. **Seeds de desenvolvimento**: popular `db/seeds.rb` com Faker — 2 usuários, 3 projetos cada, 5–10 tasks por projeto em statuses variados
+6. **System specs (Capybara)**: fluxo completo — cadastro → login → criar projeto → criar task → mover entre colunas → logout
+7. Rodar `bundle exec rspec --format documentation` — todos os testes passando
+8. Adicionar `simplecov` no `group :test` para medir cobertura — objetivo mínimo 80%
+
+## Phase 8.1: Segurança e Hardening
+1. **Hash do API token**: substituir armazenamento em texto puro por digest — salvar `BCrypt::Password.create(token)`, entregar o token raw apenas na criação/regeneração
+2. **Rate limiting**: adicionar gem `rack-attack`
+   - `config/initializers/rack_attack.rb`: throttle por IP (60 req/min na API, 5 tentativas de login por 20s)
+   - Retornar `429 Too Many Requests` com header `Retry-After` ao exceder o limite
+3. **Revisão de CSP**: ajustar `config/initializers/content_security_policy.rb` para bloquear inline scripts desnecessários em produção
+4. Rodar `bin/brakeman --no-pager` e `bin/bundler-audit` — zero warnings antes de qualquer deploy
+5. Confirmar que nenhuma credencial está hardcoded — tudo via `ENV[]` ou Rails credentials
 
 ## Phase 9: Deploy no Render.com
 1. Garantir `gem 'pg'` no Gemfile
@@ -198,17 +232,23 @@ Construir "KanbanFlow", um gerenciador de tarefas Kanban full-featured em Rails 
 - `app/models/task.rb` — enum, scopes, Turbo broadcasts
 - `app/controllers/tasks_controller.rb` — CRUD + respond_to
 - `app/controllers/api/v1/tasks_controller.rb` — REST API
+- `app/views/api/v1/projects/_project.json.jbuilder` — serialização JSON da API
 - `app/javascript/controllers/sortable_controller.js` — Stimulus drag-drop
 - `app/views/projects/show.html.erb` — Board Kanban com Turbo Streams
+- `config/initializers/rack_attack.rb` — rate limiting por IP
+- `spec/requests/api/v1/projects_spec.rb` — request specs da API com auth
 - `spec/system/tasks_spec.rb` — Capybara E2E
+- `db/seeds.rb` — dados de exemplo para desenvolvimento
 - `bin/render-build.sh` — deploy script
 
 ## Verificação
 1. `rails server` local sem erros
-2. `bundle exec rspec` - todos os testes passando
-3. Acessar /api/v1/projects e receber JSON
-4. Criar task e ver atualização real-time no board sem reload
-5. App funcionando em URL pública no Render
+2. `bundle exec rspec --format documentation` — todos os testes passando, cobertura ≥ 80%
+3. `GET /api/v1/projects?page=1` retorna dados + metadados de paginação
+4. `bin/brakeman --no-pager` e `bin/bundler-audit` sem warnings
+5. `bundle exec rails db:seed` cria dados de exemplo sem erros
+6. Criar task e ver atualização real-time no board sem reload
+7. App funcionando em URL pública no Render com PostgreSQL em produção
 
 
 Plano: KanbanFlow — Ruby on Rails 8 do zero ao deploy
@@ -269,6 +309,13 @@ TL;DR: Vamos construir o "KanbanFlow", um gerenciador de tarefas Kanban com upda
 - Scopes: scope :by_status, ->(s) { where(status: s) }
 - rails db:migrate
 
+## Phase 4.1 — Integridade do Banco de Dados
+- Migration com `null: false` nas colunas obrigatórias (`tasks.title`, `projects.name`)
+- Índice em `tasks.status` para filtros sem full table scan
+- Índice composto `[project_id, status]` — query mais frequente da API
+- Índice em `tasks.position` para ordenação eficiente
+- Confirmar constraints no schema.rb — banco garante integridade, não só o model
+
 ## Phase 5 — CRUD Completo (Projects + Tasks)
 - Rotas aninhadas: resources :projects do; resources :tasks; end
 - Controllers de Projects e Tasks com todas as 7 actions CRUD
@@ -295,13 +342,28 @@ TL;DR: Vamos construir o "KanbanFlow", um gerenciador de tarefas Kanban com upda
 - respond_to nos controllers principais → mesma action serve HTML e JSON
 - Arquivo .http no VS Code para testar todos os endpoints
 
+## Phase 7.2 — Serialização e Paginação da API
+- Extrair serialização para Jbuilder views (`app/views/api/v1/`) — controller orquestra, view serializa
+- Gem `pagy` para paginação: `GET /api/v1/projects?page=1&per_page=20`
+- Response envelope com metadados: `{ data: [...], meta: { current_page:, total_pages:, total_count: } }`
+- Padronizar formato de erro: `{ error: "mensagem" }` com status HTTP correto em todos os endpoints
+- Atualizar `api.http` com exemplos de paginação e cenários de erro
+
 ## Phase 8 — Testes com RSpec
-- rails generate rspec:install + configurar FactoryBot + Capybara
-- Model specs: validações, associations, scopes, enum methods
-- Request specs: todos os endpoints da API com e sem autenticação
-- System specs (Capybara): fluxo completo — login → criar projeto → criar task → mover status → logout
-- bundle exec rspec --format documentation
-- Bônus: SimpleCov para ver % de cobertura de testes
+- Confirmar factories (`spec/factories/`) com dados realistas via Faker
+- Model specs reais: validações, associations, scopes, enum, callbacks — nenhum `pending`
+- Request specs da API: todos os endpoints com auth Bearer (sucesso + falha + 401 + 404)
+- Seeds em `db/seeds.rb`: 2 usuários, 3 projetos cada, tasks em statuses variados
+- System specs (Capybara): cadastro → login → criar projeto → criar task → mover colunas → logout
+- `bundle exec rspec --format documentation` — 100% passando
+- SimpleCov com cobertura mínima de 80%
+
+## Phase 8.1 — Segurança e Hardening
+- Hash do API token com BCrypt — não armazenar token raw no banco
+- Gem `rack-attack`: throttle por IP (60 req/min API, 5 logins/20s)
+- Revisão de CSP para produção — bloquear inline scripts desnecessários
+- `bin/brakeman` e `bin/bundler-audit` sem warnings antes do deploy
+- Nenhuma credencial hardcoded — tudo via ENV ou Rails credentials
 
 ## Phase 9 — Deploy no Render.com
 - Garantir gem 'pg' no Gemfile (não sqlite3)
@@ -320,15 +382,21 @@ TL;DR: Vamos construir o "KanbanFlow", um gerenciador de tarefas Kanban com upda
 - app/models/task.rb — enum + scopes + Turbo broadcasts
 - app/controllers/tasks_controller.rb — CRUD + respond_to
 - app/controllers/api/v1/tasks_controller.rb — REST API pura
+- app/views/api/v1/projects/_project.json.jbuilder — serialização JSON
 - app/javascript/controllers/sortable_controller.js — drag-and-drop Stimulus
 - app/views/projects/show.html.erb — board Kanban com Turbo Streams
+- config/initializers/rack_attack.rb — rate limiting por IP
+- spec/requests/api/v1/projects_spec.rb — request specs da API com auth
 - spec/system/tasks_spec.rb — teste E2E Capybara
+- db/seeds.rb — dados de exemplo para desenvolvimento
 - bin/render-build.sh — script de deploy
 
 ## Verificação final
-- rails server local sem erros
-- bundle exec rspec — 100% dos testes passando
-- Requisição GET /api/v1/projects retorna JSON
+- `rails server` local sem erros
+- `bundle exec rspec --format documentation` — todos os testes passando, cobertura ≥ 80%
+- `GET /api/v1/projects?page=1` retorna dados + metadados de paginação
+- `bin/brakeman --no-pager` e `bin/bundler-audit` sem nenhum warning
+- `bundle exec rails db:seed` povoa o banco com dados de exemplo
 - Criar task e ver coluna Kanban atualizar sem recarregar a página
 - URL pública no Render funcionando com banco PostgreSQL em produção
 - Esse plano cobre tudo da sua lista: Ruby, Rails 8, PostgreSQL, Tailwind, Hotwire/Turbo, MVC, ORM, CRUD, autenticação, frontend integrado e API REST — mais testes e deploy. Podemos começar pela Phase 1 (WSL2) quando quiser, ou quer ajustar algo no plano antes?
