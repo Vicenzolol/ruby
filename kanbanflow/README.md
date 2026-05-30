@@ -173,18 +173,49 @@ bundle exec rspec spec/system/             # testes E2E (Capybara)
 
 ## Deploy no Render.com
 
-1. Fork e conecte o repositório no [Render.com](https://render.com)
-2. Crie um **PostgreSQL** no Render → copie a *Internal Database URL*
-3. Crie um **Web Service** apontando para `kanbanflow/`:
-   - **Build Command:** `./bin/render-build.sh`
-   - **Start Command:** `bin/rails server -b 0.0.0.0`
-4. Variáveis de ambiente necessárias:
+O projeto inclui `render.yaml` (na raiz do repositório) que automatiza a criação
+de todos os serviços via [Render Blueprint](https://render.com/docs/infrastructure-as-code).
 
-| Variável | Valor |
+### Deploy com Blueprint (recomendado)
+
+1. Faça fork e conecte o repositório no [Render.com](https://render.com)
+2. Crie um novo **Blueprint** apontando para este repositório
+3. O Render detecta o `render.yaml` e cria automaticamente:
+   - Web Service (Ruby nativo, free tier)
+   - PostgreSQL database (free tier, 90 dias)
+4. Configure o secret `RAILS_MASTER_KEY` no painel do Render:
+   - Dashboard → Web Service → Environment → Secret Files
+   - Valor: conteúdo do arquivo `kanbanflow/config/master.key`
+
+### Variáveis de ambiente
+
+| Variável | Como configurar |
 |---|---|
-| `DATABASE_URL` | Internal Database URL do PostgreSQL |
-| `RAILS_MASTER_KEY` | conteúdo de `config/master.key` |
-| `RAILS_ENV` | `production` |
+| `RAILS_MASTER_KEY` | Manual — conteúdo de `config/master.key` (nunca comite!) |
+| `DATABASE_URL` | Automático — injetado pelo Render via `render.yaml` |
+| `RENDER_EXTERNAL_URL` | Automático — URL pública da aplicação |
+| `WEB_CONCURRENCY` | Configurado no `render.yaml` (valor: `1` para free tier) |
+
+### Estrutura do deploy
+
+```
+render.yaml (raiz do repositório)
+  └── Web Service
+        rootDir: kanbanflow
+        buildCommand: bin/render-build.sh  →  bundle install
+                                              rails assets:precompile
+                                              rails db:migrate
+        startCommand: bin/rails server
+        healthCheckPath: /up
+  └── PostgreSQL (kanbanflow-db)
+        DATABASE_URL → injetado automaticamente
+```
+
+### Limitações do free tier
+
+- **Web Service**: hiberna após 15 min de inatividade; primeiro request demora ~30s
+- **PostgreSQL**: expira após 90 dias (free tier); dados são perdidos
+- **ActionCable**: usa adapter `async` (single-server); sem Turbo Streams entre múltiplos workers
 
 ---
 

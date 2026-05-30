@@ -89,20 +89,9 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  primary: &primary_production
-    <<: *default
-    database: kanbanflow_production
-    username: kanbanflow
-    password: <%= ENV["KANBANFLOW_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: kanbanflow_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: kanbanflow_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: kanbanflow_production_cable
-    migrations_paths: db/cable_migrate
+  # No Render, DATABASE_URL é injetado automaticamente pelo banco configurado
+  # no render.yaml. Rails usa automaticamente DATABASE_URL quando definido.
+  # Solid Cache/Queue/Cable usam adaptadores em memória/async neste setup
+  # simplificado — adequado para o free tier do Render.
+  url: <%= ENV["DATABASE_URL"] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>

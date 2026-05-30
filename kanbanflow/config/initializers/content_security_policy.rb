@@ -18,8 +18,12 @@ Rails.application.configure do
     policy.style_src :self, :unsafe_inline
 
     # WebSockets para ActionCable / Turbo Streams (ws em dev, wss em prod)
-    policy.connect_src :self, "ws://localhost:3000", "wss://localhost:3000",
-                       "ws://127.0.0.1:3000",  "wss://127.0.0.1:3000"
+    # RENDER_EXTERNAL_URL é fornecido automaticamente no Render (ex: https://kanbanflow.onrender.com)
+    render_ws = ENV["RENDER_EXTERNAL_URL"]&.sub(/\Ahttps?:\/\//, "wss://")
+    policy.connect_src :self,
+                       "ws://localhost:3000",  "wss://localhost:3000",
+                       "ws://127.0.0.1:3000",  "wss://127.0.0.1:3000",
+                       *[render_ws].compact
 
     # Anti-clickjacking
     policy.frame_ancestors :none

@@ -36,7 +36,7 @@ Repositório de aprendizado prático de **Ruby on Rails 8** — construindo um p
 | 7.2 | Serialização Jbuilder + paginação pagy | ✅ Concluído |
 | 8 | Testes com RSpec (model, request, system, seeds, SimpleCov) | ✅ Concluído |
 | 8.1 | Segurança e Hardening (rack-attack, CSP, brakeman, bundler-audit) | ✅ Concluído |
-| 9 | Deploy no Render.com | ⬜ Planejado |
+| 9 | Deploy no Render.com (render.yaml Blueprint, SSL, health check) | ✅ Concluído |
 
 ## Documentação
 

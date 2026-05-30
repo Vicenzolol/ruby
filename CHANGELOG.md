@@ -8,7 +8,54 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Não lançado]
 
 ### Planejado
-- Phase 9: Deploy no Render.com
+- Melhorias futuras: solid_cache + solid_queue + solid_cable com PostgreSQL
+- Domínio customizado no Render
+
+---
+
+## [1.1.0] — 2026-05-30 — Phase 9: Deploy no Render.com
+
+### Adicionado
+
+#### Render Blueprint (`render.yaml`)
+- **`render.yaml`** na raiz do repositório (Render Blueprint / Infrastructure as Code):
+  - Web Service: runtime Ruby nativo, `rootDir: kanbanflow`, plano free, região Oregon
+  - `buildCommand: bin/render-build.sh`; `startCommand: bin/rails server`
+  - Health check: `/up`; `WEB_CONCURRENCY=1`, `RAILS_MAX_THREADS=3` para free tier (512 MB)
+  - `RAILS_MASTER_KEY` configurado como `sync: false` (adicionado manualmente no painel)
+  - `DATABASE_URL` injetado automaticamente via `fromDatabase`
+  - PostgreSQL (kanbanflow-db): free tier, `databaseName: kanbanflow_production`
+
+#### Script de build (`bin/render-build.sh`)
+- **`kanbanflow/bin/render-build.sh`** (executável): `bundle install` → `assets:precompile` → `assets:clean` → `db:migrate`
+- Nota inline: em planos pagos, `db:migrate` deve ir para o "pre-deploy command" do Render
+
+#### Configurações de produção (`production.rb`)
+- `config.assume_ssl = true` — Render termina SSL no edge
+- `config.force_ssl = true` — força HTTPS; cookies seguros
+- `config.ssl_options` — exclui `/up` do redirect (health check)
+- `config.action_mailer.default_url_options` — usa `RENDER_EXTERNAL_URL` dinâmico
+- `config.hosts << /.*\.onrender\.com/` — permite o domínio padrão do Render
+- `config.active_job.queue_adapter = :async` — sem Redis/solid_queue no free tier
+
+#### Banco de dados (`config/database.yml`)
+- Produção simplificada para banco único: `url: <%= ENV["DATABASE_URL"] %>`
+- Remove configurações multi-DB (solid_cache/queue/cable) incompatíveis com free tier
+
+#### ActionCable (`config/cable.yml`)
+- Produção mudada de `adapter: redis` para `adapter: async` (sem dep. de Redis)
+
+#### Content Security Policy
+- `connect_src` atualizado com suporte dinâmico ao Render: `RENDER_EXTERNAL_URL` convertido para `wss://`; usa `*[url].compact` para não emitir `nil` quando a variável não está definida (corrige `ArgumentError: Invalid content security policy source: nil` no ambiente de test)
+
+#### Dockerfile
+- `RUBY_VERSION` corrigido de `3.3.0` → `3.4.9` para coincidir com `.ruby-version`
+
+#### README
+- `kanbanflow/README.md`: seção "Deploy no Render.com" reescrita com instruções de Blueprint, tabela de variáveis e limitações do free tier
+
+#### Resultado
+- Brakeman: 0 warnings | bundler-audit: 0 vulnerabilidades | 86 testes passando
 
 ---
 
