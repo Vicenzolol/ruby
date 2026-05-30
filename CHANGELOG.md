@@ -13,6 +13,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.1.1] — 2026-05-30 — Hotfix: seeds em produção e api.http
+
+### Corrigido
+
+#### `db/seeds.rb` — guard de ambiente (fix deploy Render)
+- `db:prepare` em produção executa `db:seed` quando o banco é novo (`db:setup`)
+- `Faker` é gem de `development` e não está disponível em produção, causando `NameError: uninitialized constant Faker`
+- **Fix**: todo o bloco de seeds envolvido em `unless Rails.env.production?`; em produção o seeds retorna imediatamente sem criar dados de demo
+
+#### `api.http` — REST Client environments
+- Substituídas as variáveis hardcoded `@baseUrl` e `@token` por **REST Client environments** (`.vscode/settings.json`, gitignordo)
+- Dois ambientes pré-configurados: `development` (`http://127.0.0.1:3000`) e `production` (`https://kanbanflow.onrender.com`)
+- Token é definido localmente em `.vscode/settings.json` sem risco de commitar o valor real
+- Seleção de ambiente pelo seletor na barra de status do VS Code (canto inferior direito)
+
+---
+
 ## [1.1.0] — 2026-05-30 — Phase 9: Deploy no Render.com
 
 ### Adicionado

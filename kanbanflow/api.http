@@ -2,14 +2,12 @@
 # Extensão: humao.rest-client
 #
 # Como usar:
-#   1. Rode a app: cd kanbanflow && bin/dev
-#   2. Obtenha seu token em: GET http://127.0.0.1:3000/api/v1/me
-#      (use o token exibido no banco ou após criar conta)
-#   3. Substitua {{token}} pelo seu api_token
-#   4. Clique em "Send Request" acima de cada bloco
-
-@baseUrl = http://127.0.0.1:3000/api/v1
-@token   = SEU_TOKEN_AQUI
+#   1. Selecione o ambiente na barra de status do VS Code (canto inferior direito)
+#      → "development" para testar localmente (bin/dev)
+#      → "production" para testar no Render
+#   2. Edite .vscode/settings.json (gitignordo) e substitua SEU_TOKEN_AQUI pelo
+#      seu api_token (obtenha em GET /api/v1/me após criar conta e logar)
+#   3. Clique em "Send Request" acima de cada bloco
 
 ###
 # ─── USUÁRIO ────────────────────────────────────────────────────────────────
