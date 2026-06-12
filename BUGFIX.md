@@ -5,6 +5,66 @@ Cada entrada inclui o contexto, causa raiz e solução aplicada.
 
 ---
 
+## BUG-002 — Tela de login exibida mesmo após autenticação
+
+**Data:** 2026-06-12
+**Severidade:** Média — experiência quebrada; usuário logado via `/` via tela de login repetidamente
+
+### Sintoma
+
+Após fazer login, o usuário permanecia na tela de login (`/`) em vez de ser redirecionado ao dashboard. Ao acessar `http://localhost:3000/` já estando logado, a tela de login era exibida novamente sem qualquer aviso ou redirecionamento.
+
+### Causa raiz
+
+Dois problemas encadeados:
+
+| # | Arquivo | Problema |
+|---|---|---|
+| 1 | `config/routes.rb` | `root "sessions#new"` fazia a raiz `/` apontar para a tela de login para todos, autenticados ou não |
+| 2 | `authentication.rb` | `after_authentication_url` devolvia `root_url` que, sendo `sessions#new`, redirecionava o recém-logado de volta à tela de login |
+
+### Solução aplicada
+
+- `config/routes.rb`: `root` alterado para `"projects#index"`. O concern `Authentication` já chama `require_authentication` em projetos, então usuários não autenticados são redirecionados para login automaticamente.
+- `sessions_controller.rb#new`: adicionado `redirect_to root_path if authenticated?` para evitar que usuários já logados vejam a tela de login.
+- `sessions_controller.rb#create`: adicionado `notice: "Logado com sucesso!"` ao redirect para dar feedback visual imediato.
+
+---
+
+## BUG-003 — Email de reset de senha não era entregue
+
+**Data:** 2026-06-12
+**Severidade:** Alta — funcionalidade de recuperação de senha completamente inoperante em produção
+
+### Sintoma
+
+Ao clicar em "Esqueci minha senha" e submeter o formulário, a aplicação exibia a mensagem de sucesso normalmente, mas o email nunca chegava ao destinatário.
+
+### Causa raiz
+
+Três problemas encadeados:
+
+| # | Arquivo | Problema |
+|---|---|---|
+| 1 | `config/environments/production.rb` | Bloco `smtp_settings` comentado — Rails sem delivery method configurado usava `:test` (descarta os emails silenciosamente) |
+| 2 | `app/mailers/application_mailer.rb` | `from: "from@example.com"` — endereço inválido rejeitado por servidores SMTP |
+| 3 | `app/controllers/passwords_controller.rb` | `deliver_later` com `queue_adapter: :async` — jobs enfileirados na memória são perdidos quando o Render (free tier) coloca o processo em sleep |
+
+### Solução aplicada
+
+- `production.rb`: SMTP configurado para `smtp.resend.com:587` com autenticação via `RESEND_API_KEY` (env var no Render)
+- `application_mailer.rb`: `from:` substituído por `ENV.fetch("MAILER_FROM", "onboarding@resend.dev")` — configurável via env sem redeploy
+- `passwords_controller.rb`: `deliver_later` → `deliver_now` para evitar perda de jobs em instâncias efêmeras
+
+### Configuração necessária no Render
+
+| Variável | Valor |
+|---|---|
+| `RESEND_API_KEY` | chave gerada no painel do Resend |
+| `MAILER_FROM` | `noreply@seudominio.com` (após verificar domínio no Resend) |
+
+---
+
 ## BUG-001 — Tailwind CSS sem efeito na interface
 
 **Data:** 2026-05-20  

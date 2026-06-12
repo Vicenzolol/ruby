@@ -62,14 +62,16 @@ Rails.application.configure do
   render_host = ENV.fetch("RENDER_EXTERNAL_URL", "kanbanflow.onrender.com").delete_prefix("https://").delete_prefix("http://")
   config.action_mailer.default_url_options = { host: render_host, protocol: "https" }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # Resend SMTP relay — API key via env var RESEND_API_KEY
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.smtp_settings = {
+    address: "smtp.resend.com",
+    port: 587,
+    authentication: :plain,
+    user_name: "resend",
+    password: ENV.fetch("RESEND_API_KEY")
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

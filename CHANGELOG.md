@@ -13,6 +13,35 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.1.4] — 2026-06-12 — Correção de entrega de email (reset de senha)
+
+### Corrigido
+
+#### `config/environments/production.rb`
+- SMTP configurado para `smtp.resend.com:587` via variável de ambiente `RESEND_API_KEY`
+- `raise_delivery_errors = true` habilitado para não suprimir erros silenciosamente
+
+#### `app/mailers/application_mailer.rb`
+- `from:` corrigido de `from@example.com` para `ENV.fetch("MAILER_FROM", "onboarding@resend.dev")`
+
+#### `app/controllers/passwords_controller.rb`
+- `deliver_later` → `deliver_now`: evita perda de jobs em instâncias free tier do Render que entram em sleep
+
+---
+
+## [1.1.3] — 2026-06-12 — Correção de redirect pós-login
+
+### Corrigido
+
+#### `config/routes.rb`
+- `root` alterado de `sessions#new` para `projects#index`: usuários autenticados que acessam `/` são enviados direto ao dashboard em vez de verem a tela de login
+
+#### `app/controllers/sessions_controller.rb`
+- `new`: redireciona para `root_path` com aviso se o usuário já estiver autenticado
+- `create`: exibe flash `notice: "Logado com sucesso!"` após autenticação bem-sucedida, em vez de retornar silenciosamente para a raiz
+
+---
+
 ## [1.1.2] — 2026-06-12 — CORS para API REST
 
 ### Adicionado
