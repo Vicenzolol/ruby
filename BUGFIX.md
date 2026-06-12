@@ -5,6 +5,34 @@ Cada entrada inclui o contexto, causa raiz e solução aplicada.
 
 ---
 
+## BUG-005 — Net::OpenTimeout ao enviar email de reset de senha em produção
+
+**Data:** 2026-06-12
+**Severidade:** Alta — funcionalidade de reset de senha gera 500 em produção
+
+### Sintoma
+
+Ao submeter o formulário de reset de senha (`POST /passwords`), a aplicação retorna HTTP 500 após ~5.6 segundos com:
+
+```
+Net::OpenTimeout (execution expired):
+app/controllers/passwords_controller.rb:11:in 'PasswordsController#create'
+```
+
+### Causa raiz
+
+O Render.com bloqueia conexões SMTP de saída na porta 587 (e 25) no plano gratuito. A configuração usava `smtp.resend.com:587` — a tentativa de conexão TCP expira após o timeout padrão do Net::SMTP.
+
+### Solução aplicada
+
+- `Gemfile`: adicionado `gem "resend"` — usa HTTP API em vez de SMTP, contornando o bloqueio de porta
+- `config/environments/production.rb`: `delivery_method` alterado de `:smtp` com `smtp_settings` para `:resend`
+- `config/initializers/resend.rb`: criado para configurar `Resend.api_key = ENV.fetch("RESEND_API_KEY", nil)`
+
+A variável `RESEND_API_KEY` no Render permanece a mesma; apenas o mecanismo de transporte mudou de SMTP para HTTP.
+
+---
+
 ## BUG-004 — Build Docker falha com `KeyError: key not found: "RESEND_API_KEY"`
 
 **Data:** 2026-06-12

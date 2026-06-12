@@ -5,6 +5,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.1.6] — 2026-06-12 — Correção de Net::OpenTimeout no envio de email de reset
+
+### Corrigido
+
+#### `Gemfile` + `config/environments/production.rb` + `config/initializers/resend.rb`
+- Substituído delivery via SMTP (`smtp.resend.com:587`) pelo adapter HTTP do gem `resend`
+- Render.com bloqueia porta 587 no plano gratuito; HTTP não é bloqueado
+- `Resend.api_key` configurado via initializer lendo `RESEND_API_KEY` do ambiente
+
+---
+
 ## [1.1.5] — 2026-06-12 — Correção de build Docker (RESEND_API_KEY em assets:precompile)
 
 ### Corrigido
