@@ -5,6 +5,50 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.2.0] — 2026-06-12 — Redesign visual: design system unificado (Linear/Trello/Notion)
+
+### Adicionado
+
+#### `app/assets/tailwind/application.css`
+- Bloco `@layer components` com o design system reutilizável: botões (`.btn`,
+  `.btn-primary`, `.btn-secondary`, `.btn-danger`, `.btn-sm`), formulários
+  (`.label`, `.input`, `.textarea`, `.select`), `.card`, alerts
+  (`.alert-success`, `.alert-error`) e Kanban (`.kanban-column`,
+  `.kanban-column--over`, `.kanban-card`)
+
+#### `app/javascript/controllers/board_controller.js`
+- Realce da coluna de destino durante o drag-and-drop via `onStart`/`onMove`
+  (classe `.kanban-column--over`), com limpeza garantida no `onEnd`
+
+### Alterado
+
+#### Identidade visual
+- Cor primária unificada de `indigo` para `blue-600`/`blue-700` em todo o app
+  (navbar, projetos, formulários, board, telas de auth)
+- Navbar: destaque da página ativa (“Meus Projetos”) via `current_page?`;
+  botões padronizados; remoção da sombra para um cabeçalho mais sóbrio
+
+#### Board Kanban (`projects/show.html.erb`, `tasks/_task.html.erb`)
+- Hierarquia invertida no padrão Trello/Linear: colunas em cinza suave
+  (`.kanban-column`) e cards brancos (`.kanban-card`)
+- Cabeçalho de coluna em caixa-alta com badge de contagem; espaçamento padronizado
+
+#### Telas de autenticação
+- `sessions/new`, `passwords/new` e `passwords/edit` reescritas no layout de card
+  centralizado (igual ao cadastro), traduzidas para português e usando os
+  componentes do design system; `registrations/new` migrada para `blue` + componentes
+
+#### Formulários e listagens
+- `projects/_form`, `tasks/_form`, `projects/index`, `projects/_project` e
+  `tasks/new` passam a usar os componentes (`.input`, `.label`, `.btn-*`, `.card`),
+  eliminando classes longas repetidas inline
+
+> Sem alterações de regras de negócio. Os specs de sistema (browser) seguem
+> falhando por motivo pré-existente (textos de UI em inglês desatualizados +
+> chromedriver); os demais 93 examples permanecem verdes.
+
+---
+
 ## [1.1.9] — 2026-06-12 — Correção do formulário de edição de tarefas (rota shallow)
 
 ### Corrigido

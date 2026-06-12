@@ -1,6 +1,6 @@
 <%= form_with model: project, class: "space-y-5" do |f| %>
   <% if project.errors.any? %>
-    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+    <div class="alert-error">
       <p class="font-semibold mb-1">
         <%= pluralize(project.errors.count, "erro", "erros") %> impediram salvar o projeto:
       </p>
@@ -13,19 +13,17 @@
   <% end %>
 
   <div>
-    <%= f.label :name, "Nome do projeto", class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= f.text_field :name, placeholder: "Ex: KanbanFlow",
-        class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+    <%= f.label :name, "Nome do projeto", class: "label" %>
+    <%= f.text_field :name, placeholder: "Ex: KanbanFlow", class: "input" %>
   </div>
 
   <div>
-    <%= f.label :description, "Descrição (opcional)", class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= f.text_area :description, rows: 3, placeholder: "Sobre o que é este projeto?",
-        class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none" %>
+    <%= f.label :description, "Descrição (opcional)", class: "label" %>
+    <%= f.text_area :description, rows: 3, placeholder: "Sobre o que é este projeto?", class: "textarea" %>
   </div>
 
   <div>
-    <%= f.label :color, "Cor do projeto", class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= f.label :color, "Cor do projeto", class: "label" %>
     <div class="flex gap-2 flex-wrap">
       <% Project::COLORS.each do |hex| %>
         <label class="relative cursor-pointer">
@@ -43,7 +41,6 @@
   </div>
 
   <div class="pt-2">
-    <%= f.submit project.new_record? ? "Criar Projeto" : "Salvar Alterações",
-        class: "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg cursor-pointer transition-colors" %>
+    <%= f.submit project.new_record? ? "Criar Projeto" : "Salvar Alterações", class: "btn btn-primary w-full" %>
   </div>
 <% end %>

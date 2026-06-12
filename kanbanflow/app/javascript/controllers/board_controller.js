@@ -7,7 +7,7 @@ import Sortable from "sortablejs"
 //      data-board-target="taskList" em cada lista de tarefas com data-status="..."
 
 export default class extends Controller {
-  static targets = ["taskList"]
+  static targets = ["taskList", "column"]
   static values  = { updateUrl: String }
 
   connect() {
@@ -20,6 +20,18 @@ export default class extends Controller {
 
   // --- privado ---
 
+  // Realça a coluna de destino sob o cursor; limpa as demais.
+  #highlightColumn(list) {
+    const target = list && list.closest("[data-board-target='column']")
+    this.columnTargets.forEach(col =>
+      col.classList.toggle("kanban-column--over", col === target)
+    )
+  }
+
+  #clearHighlight() {
+    this.columnTargets.forEach(col => col.classList.remove("kanban-column--over"))
+  }
+
   #makeSortable(list) {
     return Sortable.create(list, {
       group:     "kanban",          // permite mover entre listas diferentes
@@ -27,7 +39,12 @@ export default class extends Controller {
       ghostClass: "opacity-40",
       dragClass:  "shadow-xl",
 
+      onStart: (event) => this.#highlightColumn(event.from),
+      onMove:  (event) => { this.#highlightColumn(event.to); return true },
+
       onEnd: (event) => {
+        this.#clearHighlight()
+
         const taskId = event.item.dataset.taskId
         const newStatus = event.to.dataset.status
 
