@@ -27,6 +27,8 @@ gem "pagy"
 gem "rack-attack"
 # CORS headers for Swagger UI preflight requests
 gem "rack-cors"
+# Resend email delivery via HTTP API (avoids SMTP port blocking on Render)
+gem "resend"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
