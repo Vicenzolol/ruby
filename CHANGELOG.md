@@ -5,6 +5,24 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.1.8] — 2026-06-12 — Envio de email local via Resend com dotenv-rails
+
+### Adicionado
+
+#### `Gemfile`
+- Gem `dotenv-rails` no grupo `:development` para carregar variáveis do `.env`
+
+#### `.env.example`
+- Arquivo de referência com as variáveis de ambiente necessárias em desenvolvimento
+
+### Alterado
+
+#### `config/environments/development.rb`
+- `delivery_method` trocado para `:resend` — mesmo provider da produção
+- `raise_delivery_errors = true` mantido para facilitar debugging
+
+---
+
 ## [1.1.7] — 2026-06-12 — Mensagens de erro específicas no reset de senha
 
 ### Corrigido

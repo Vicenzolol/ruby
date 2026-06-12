@@ -61,6 +61,7 @@ http://localhost:3000
 - **Página inicial** → formulário de login
 - **Criar conta** → `http://localhost:3000/registration/new`
 - **Login** → `http://localhost:3000/session/new`
+- **Emails interceptados** → `http://localhost:3000/letter_opener` (apenas em desenvolvimento)
 
 ---
 
