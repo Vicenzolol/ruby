@@ -157,6 +157,11 @@ DELETE /api/v1/projects/:id/tasks/:id
 
 > Teste os endpoints com o arquivo [`api.http`](api.http) usando a extensão REST Client do VS Code.
 
+#### CORS
+
+A API aceita requisições cross-origin de `localhost:3000` (configurado em `config/initializers/cors.rb` via `rack-cors`).
+Para permitir outras origens (ex.: frontend em produção), adicione-as ao bloco `origins` do inicializador.
+
 ---
 
 ## Rodando os testes

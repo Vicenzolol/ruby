@@ -13,6 +13,27 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.1.2] — 2026-06-12 — CORS para API REST
+
+### Adicionado
+
+#### `rack-cors` gem
+- Adicionado `rack-cors 3.0.0` ao Gemfile para suporte a CORS (Cross-Origin Resource Sharing)
+- Permite que clientes JavaScript em `localhost:3000` façam requisições preflight para a API
+
+#### `config/initializers/cors.rb`
+- Novo inicializador configurando `Rack::Cors` para a rota `/api/*`
+- Origens permitidas: `http://localhost:3000`, `http://127.0.0.1:3000`, `http://[::1]:3000`
+- Métodos permitidos: `GET`, `POST`, `PATCH`, `PUT`, `DELETE`, `OPTIONS`, `HEAD`
+- Headers aceitos: `:any`
+
+### Alterado
+
+#### `.gitignore`
+- `CLAUDE.md` adicionado ao `.gitignore` (arquivo de instruções para IA, não deve ser versionado)
+
+---
+
 ## [1.1.1] — 2026-05-30 — Hotfix: seeds em produção e api.http
 
 ### Corrigido
