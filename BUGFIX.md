@@ -5,6 +5,30 @@ Cada entrada inclui o contexto, causa raiz e solução aplicada.
 
 ---
 
+## BUG-004 — Build Docker falha com `KeyError: key not found: "RESEND_API_KEY"`
+
+**Data:** 2026-06-12
+**Severidade:** Crítica — impede deploy no Render.com completamente
+
+### Sintoma
+
+O build Docker no Render.com falha no estágio `assets:precompile` com:
+
+```
+KeyError: key not found: "RESEND_API_KEY"
+/rails/config/environments/production.rb:73:in 'fetch'
+```
+
+### Causa raiz
+
+`config/environments/production.rb` usava `ENV.fetch("RESEND_API_KEY")` (sem valor padrão) na configuração SMTP de `action_mailer`. O Rails carrega o arquivo de configuração de ambiente durante `assets:precompile`, mas nesse estágio do build Docker as variáveis de ambiente de runtime (como `RESEND_API_KEY`) ainda não estão injetadas — apenas `SECRET_KEY_BASE_DUMMY=1` é passado. O `fetch` sem fallback lança `KeyError` imediatamente.
+
+### Solução
+
+Alterado para `ENV.fetch("RESEND_API_KEY", nil)` em [kanbanflow/config/environments/production.rb:73](kanbanflow/config/environments/production.rb). O valor `nil` é seguro pois nenhum e-mail é enviado durante a compilação de assets; a chave real estará disponível em runtime no Render.
+
+---
+
 ## BUG-002 — Tela de login exibida mesmo após autenticação
 
 **Data:** 2026-06-12

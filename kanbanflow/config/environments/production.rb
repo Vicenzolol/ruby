@@ -70,7 +70,7 @@ Rails.application.configure do
     port: 587,
     authentication: :plain,
     user_name: "resend",
-    password: ENV.fetch("RESEND_API_KEY")
+    password: ENV.fetch("RESEND_API_KEY", nil)
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to

@@ -5,6 +5,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.1.5] — 2026-06-12 — Correção de build Docker (RESEND_API_KEY em assets:precompile)
+
+### Corrigido
+
+#### `config/environments/production.rb`
+- `ENV.fetch("RESEND_API_KEY")` substituído por `ENV.fetch("RESEND_API_KEY", nil)` para evitar `KeyError` durante o estágio `assets:precompile` no Docker, onde variáveis de ambiente de runtime ainda não estão disponíveis
+
+---
+
 ## [Não lançado]
 
 ### Planejado
