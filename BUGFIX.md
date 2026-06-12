@@ -5,6 +5,31 @@ Cada entrada inclui o contexto, causa raiz e solução aplicada.
 
 ---
 
+## BUG-006 — Mensagem de erro genérica no reset de senha não indica a causa real
+
+**Data:** 2026-06-12
+**Severidade:** Baixa — UX ruim; usuário não sabe se a senha é curta ou se a confirmação diverge
+
+### Sintoma
+
+Ao preencher o formulário "Redefinir senha" com senha e confirmação divergentes (ou senha < 8 caracteres), a página exibia apenas "Passwords did not match." independentemente do motivo real da falha.
+
+### Causa raiz
+
+O `PasswordsController#update` usava uma mensagem hardcoded no `redirect_to ... alert:` em vez de consultar `@user.errors.full_messages`. Qualquer falha de validação — confirmação divergente **ou** senha curta — retornava a mesma mensagem genérica.
+
+### Solução aplicada
+
+- `passwords_controller.rb`: ao falhar, popula `flash[:alert_errors]` com `@user.errors.full_messages` (lista de strings)
+- `passwords/edit.html.erb`: renderiza `flash[:alert_errors]` como lista `<ul>` com bullet points
+- `config/locales/en.yml`: traduzidas mensagem de confirmação (`"não confere com %{attribute}"`) e atributos `password`/`password_confirmation` para PT-BR
+
+Agora o usuário vê, por exemplo:
+- _"Confirmação de senha não confere com senha"_ — quando as senhas divergem
+- _"Senha deve ter pelo menos 8 caracteres"_ — quando a senha é muito curta
+
+---
+
 ## BUG-005 — Net::OpenTimeout ao enviar email de reset de senha em produção
 
 **Data:** 2026-06-12

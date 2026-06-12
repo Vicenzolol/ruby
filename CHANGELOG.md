@@ -5,6 +5,24 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.1.7] — 2026-06-12 — Mensagens de erro específicas no reset de senha
+
+### Corrigido
+
+#### `app/controllers/passwords_controller.rb`
+- `update` agora usa `@user.errors.full_messages` em vez de mensagem genérica "Passwords did not match"
+- Erros são passados via `flash[:alert_errors]` para exibição em lista
+
+#### `app/views/passwords/edit.html.erb`
+- Exibe lista de erros de validação (`alert_errors`) com bullet points
+- Informa especificamente se a senha é curta demais ou se a confirmação não confere
+
+#### `config/locales/en.yml`
+- Adicionada tradução PT-BR para a mensagem de confirmação: `"não confere com %{attribute}"`
+- Adicionados atributos traduzidos (`senha`, `confirmação de senha`) para mensagens legíveis
+
+---
+
 ## [1.1.6] — 2026-06-12 — Correção de Net::OpenTimeout no envio de email de reset
 
 ### Corrigido

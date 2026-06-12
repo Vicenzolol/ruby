@@ -29,3 +29,11 @@
 
 en:
   hello: "Hello world"
+  errors:
+    messages:
+      confirmation: "não confere com %{attribute}"
+  activerecord:
+    attributes:
+      user:
+        password: "senha"
+        password_confirmation: "confirmação de senha"
