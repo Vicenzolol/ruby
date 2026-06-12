@@ -5,6 +5,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.1.9] — 2026-06-12 — Correção do formulário de edição de tarefas (rota shallow)
+
+### Corrigido
+
+#### `app/views/tasks/_form.html.erb`
+- `form_with model:` passa `[@project, task]` apenas quando `@project` está presente (ações `new`/`create`); nas ações shallow (`edit`/`update`) passa somente `task`, resolvendo corretamente para `task_path` em vez de `project_task_path`
+
+---
+
 ## [1.1.8] — 2026-06-12 — Envio de email local via Resend com dotenv-rails
 
 ### Adicionado

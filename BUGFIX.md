@@ -5,6 +5,27 @@ Cada entrada inclui o contexto, causa raiz e solução aplicada.
 
 ---
 
+## BUG-007 — NoMethodError: `project_task_path` ao editar tarefa via rota shallow
+
+**Data:** 2026-06-12
+**Severidade:** Alta — ação `edit` completamente inacessível
+
+### Sintoma
+
+Ao acessar `/tasks/:id/edit`, a view lançava `NoMethodError: undefined method 'project_task_path'` na linha do `form_with`.
+
+### Causa raiz
+
+O partial `tasks/_form.html.erb` usava `model: [@project || task.project, task]`. Com `shallow: true`, as rotas `edit`/`update` são `/tasks/:id` — sem `:project_id` na URL — e o controller não popula `@project` nessas ações. O fallback `task.project` ainda resultava num array `[project, task]`, que o Rails tentava resolver como rota aninhada (`project_task_path`), inexistente para rotas shallow.
+
+### Solução aplicada
+
+- `app/views/tasks/_form.html.erb`: mudado para `model: (@project ? [@project, task] : task)`
+  - Quando `@project` está presente (`new`/`create`): usa rota aninhada `project_tasks_path`
+  - Quando ausente (`edit`/`update` shallow): usa rota direta `task_path`
+
+---
+
 ## BUG-006 — Mensagem de erro genérica no reset de senha não indica a causa real
 
 **Data:** 2026-06-12
