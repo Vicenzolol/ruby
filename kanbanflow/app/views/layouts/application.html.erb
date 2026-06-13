@@ -22,25 +22,26 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-50 text-gray-900">
-    <nav class="bg-white border-b border-gray-200">
+  <body class="bg-slate-100 text-gray-900">
+    <nav class="bg-gradient-to-r from-blue-800 to-indigo-900 shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
           <div class="flex items-center gap-2">
-            <span class="text-xl text-blue-600">📋</span>
-            <%= link_to "Aprendendo e Fazendo Kanban", root_path, class: "text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors" %>
+            <span class="text-xl">📋</span>
+            <%= link_to "KanbanFlow", root_path, class: "text-lg font-bold text-white hover:text-blue-200 transition-colors tracking-tight" %>
           </div>
 
           <div class="flex items-center gap-4">
             <% if authenticated? %>
               <%= link_to "Meus Projetos", projects_path,
-                  class: "text-sm font-medium hidden sm:block transition-colors #{current_page?(projects_path) ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'}" %>
-              <span class="text-sm text-gray-300 hidden sm:block">|</span>
-              <span class="text-sm text-gray-500 hidden sm:block"><%= Current.user.email_address %></span>
-              <%= button_to "Sair", session_path, method: :delete, class: "btn btn-secondary btn-sm" %>
+                  class: "text-sm font-medium hidden sm:block transition-colors #{current_page?(projects_path) ? 'text-white font-semibold underline underline-offset-4 decoration-blue-300' : 'text-blue-200 hover:text-white'}" %>
+              <span class="text-blue-500 hidden sm:block">|</span>
+              <span class="text-sm text-blue-300 hidden sm:block"><%= Current.user.email_address %></span>
+              <%= button_to "Sair", session_path, method: :delete,
+                  class: "btn btn-sm bg-white/10 text-white border border-white/20 hover:bg-white/20 focus:ring-white/40" %>
             <% else %>
-              <%= link_to "Entrar", new_session_path, class: "text-sm text-gray-600 hover:text-blue-600 font-medium" %>
-              <%= link_to "Criar conta", new_registration_path, class: "btn btn-primary btn-sm" %>
+              <%= link_to "Entrar", new_session_path, class: "text-sm text-blue-200 hover:text-white font-medium transition-colors" %>
+              <%= link_to "Criar conta", new_registration_path, class: "btn btn-sm bg-white text-blue-800 hover:bg-blue-50 font-semibold shadow-sm" %>
             <% end %>
           </div>
         </div>
@@ -49,12 +50,12 @@
 
     <% if notice = flash[:notice] %>
       <div class="max-w-7xl mx-auto px-4 mt-4">
-        <p class="alert-success" role="alert"><%= notice %></p>
+        <p class="alert-success" role="alert">✓ <%= notice %></p>
       </div>
     <% end %>
     <% if alert = flash[:alert] %>
       <div class="max-w-7xl mx-auto px-4 mt-4">
-        <p class="alert-error" role="alert"><%= alert %></p>
+        <p class="alert-error" role="alert">⚠ <%= alert %></p>
       </div>
     <% end %>
 

@@ -5,6 +5,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.2.1] — 2026-06-12 — Personalidade visual: navbar dark, colunas coloridas, fix botões
+
+### Alterado
+
+#### Identidade visual
+- Navbar: fundo `from-blue-800 to-indigo-900` (gradiente escuro) com texto branco — saída do estilo genérico branco
+- Body: `bg-gray-50` → `bg-slate-100` para mais contraste com os cards
+- `.kanban-column` agora usa `bg-white` + `border-t-4` colorida por status via `.kanban-column--todo/--progress/--done` (azul / âmbar / esmeralda)
+- `.kanban-card` ganhou variantes `.kanban-card--todo/--progress/--done` com borda lateral colorida
+- Cabeçalhos de coluna: `text-xs font-bold uppercase tracking-widest` com cor por status
+- Badge de contagem de tarefas: colorido por status no lugar do cinza genérico
+- Card de projeto (`_project.html.erb`): botão "Ver board" virou `btn-primary` sólido; hover no nome do projeto em azul; contagem de tarefas com pill cinza
+- Botões `.btn-primary` e `.btn-danger`: receberam `shadow-sm` colorida para dar profundidade
+
+#### Fix
+- `tasks/_task.html.erb`: `button_to "Excluir"` recebia `form: { class: "inline-flex items-center" }` — o `<form>` gerado era `display:block` e quebrava o alinhamento com o link "Editar"
+
+---
+
 ## [1.2.0] — 2026-06-12 — Redesign visual: design system unificado (Linear/Trello/Notion)
 
 ### Adicionado

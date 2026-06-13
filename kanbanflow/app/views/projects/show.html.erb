@@ -25,13 +25,21 @@
      data-controller="board"
      data-board-update-url-value="<%= update_task_status_project_path(@project) %>">
 
-  <% { "A Fazer" => :todo, "Em Andamento" => :in_progress, "Concluído" => :done }.each do |label, status_key| %>
-    <div class="kanban-column"
+  <%
+    column_meta = {
+      "A Fazer"      => { key: :todo,        col_class: "kanban-column--todo",     badge: "bg-blue-100 text-blue-700",    text: "text-blue-700" },
+      "Em Andamento" => { key: :in_progress, col_class: "kanban-column--progress", badge: "bg-amber-100 text-amber-700",  text: "text-amber-700" },
+      "Concluído"    => { key: :done,        col_class: "kanban-column--done",     badge: "bg-emerald-100 text-emerald-700", text: "text-emerald-700" }
+    }
+  %>
+  <% column_meta.each do |label, meta| %>
+    <% status_key = meta[:key] %>
+    <div class="kanban-column <%= meta[:col_class] %>"
          data-board-status-value="<%= status_key %>"
          data-board-target="column">
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500"><%= label %></h2>
-        <span class="text-xs font-medium bg-gray-200 text-gray-600 rounded-full px-2 py-0.5"
+        <h2 class="text-xs font-bold uppercase tracking-widest <%= meta[:text] %>"><%= label %></h2>
+        <span class="text-xs font-semibold rounded-full px-2 py-0.5 <%= meta[:badge] %>"
               id="<%= status_key %>-count">
           <%= @tasks_by_status[status_key].size %>
         </span>
@@ -57,6 +65,7 @@
   <% end %>
 
 </div>
+
 
 <div class="mt-6">
   <%= link_to "← Meus Projetos", projects_path, class: "text-sm text-gray-500 hover:text-gray-700" %>
