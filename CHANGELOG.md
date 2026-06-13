@@ -5,6 +5,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.2.2] — 2026-06-12 — Fix: Swagger UI em produção com NetworkError e CORS
+
+### Corrigido
+- `config/initializers/rswag_api.rb`: `swagger_filter` injeta `servers[].url` dinamicamente a partir do host do request — resolve NetworkError no Swagger UI de produção (que antes apontava para `localhost:3000`)
+- `config/initializers/cors.rb`: adicionado `https://*.onrender.com` às origens permitidas via regex — necessário para clientes externos que consomem a API em produção
+
+---
+
 ## [1.2.1] — 2026-06-12 — Personalidade visual: navbar dark, colunas coloridas, fix botões
 
 ### Alterado
